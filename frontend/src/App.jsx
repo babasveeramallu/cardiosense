@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-const API_URL = 'http://192.168.1.100:8000'; // Replace with your Pi's IP
+const API_URL = 'http://192.168.12.195:8000';
 
 function App() {
   const [vitals, setVitals] = useState({

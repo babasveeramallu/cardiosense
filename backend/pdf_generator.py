@@ -3,67 +3,105 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, PageBreak
 from reportlab.lib.units import inch
-from reportlab.graphics.shapes import Drawing, Line, Circle
+from reportlab.graphics.shapes import Drawing, Line, Circle, Rect
 from reportlab.graphics.charts.linecharts import HorizontalLineChart
+from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics import renderPDF
 from datetime import datetime
 import io
 
-def create_ecg_waveform(width=400, height=150):
-    """Generate ECG waveform drawing"""
+def create_ecg_waveform(width=500, height=180, st_elevation=0.0, t_wave=0.3):
+    """Generate ECG waveform drawing with dynamic values"""
     drawing = Drawing(width, height)
+    
+    # Background
+    drawing.add(Rect(0, 0, width, height, fillColor=colors.HexColor('#1e293b'), strokeColor=None))
     
     # Grid background
     for i in range(0, int(width), 20):
-        drawing.add(Line(i, 0, i, height, strokeColor=colors.lightgrey, strokeWidth=0.5))
+        drawing.add(Line(i, 0, i, height, strokeColor=colors.HexColor('#374151'), strokeWidth=0.5))
     for i in range(0, int(height), 20):
-        drawing.add(Line(0, i, width, i, strokeColor=colors.lightgrey, strokeWidth=0.5))
+        drawing.add(Line(0, i, width, i, strokeColor=colors.HexColor('#374151'), strokeWidth=0.5))
     
-    # ECG waveform
+    # ECG waveform - draw multiple heartbeats
     baseline = height / 2
-    x = 20
+    beat_width = 120
     
-    # P wave
-    drawing.add(Line(x, baseline, x+15, baseline-20, strokeColor=colors.red, strokeWidth=2))
-    drawing.add(Line(x+15, baseline-20, x+30, baseline, strokeColor=colors.red, strokeWidth=2))
-    x += 40
-    
-    # QRS complex
-    drawing.add(Line(x, baseline, x+5, baseline+10, strokeColor=colors.red, strokeWidth=2))  # Q
-    drawing.add(Line(x+5, baseline+10, x+10, baseline-60, strokeColor=colors.red, strokeWidth=2))  # R
-    drawing.add(Line(x+10, baseline-60, x+15, baseline+15, strokeColor=colors.red, strokeWidth=2))  # S
-    drawing.add(Line(x+15, baseline+15, x+20, baseline, strokeColor=colors.red, strokeWidth=2))
-    x += 30
-    
-    # ST segment
-    drawing.add(Line(x, baseline, x+40, baseline, strokeColor=colors.red, strokeWidth=2))
-    x += 40
-    
-    # T wave
-    drawing.add(Line(x, baseline, x+20, baseline-30, strokeColor=colors.red, strokeWidth=2))
-    drawing.add(Line(x+20, baseline-30, x+40, baseline, strokeColor=colors.red, strokeWidth=2))
+    for beat in range(3):
+        x_offset = 20 + (beat * beat_width)
+        
+        # P wave
+        p_points = []
+        for i in range(15):
+            x = x_offset + i
+            y = baseline - 15 * (i/15) * ((15-i)/15) * 4
+            p_points.append((x, y))
+        for i in range(len(p_points)-1):
+            drawing.add(Line(p_points[i][0], p_points[i][1], p_points[i+1][0], p_points[i+1][1], 
+                           strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        
+        x = x_offset + 20
+        
+        # PR segment
+        drawing.add(Line(x, baseline, x+15, baseline, strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        x += 15
+        
+        # QRS complex
+        # Q wave
+        drawing.add(Line(x, baseline, x+3, baseline+8, strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        x += 3
+        # R wave (tall spike)
+        drawing.add(Line(x, baseline+8, x+5, baseline-55, strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        x += 5
+        # S wave
+        drawing.add(Line(x, baseline-55, x+3, baseline+10, strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        x += 3
+        drawing.add(Line(x, baseline+10, x+3, baseline, strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        x += 3
+        
+        # ST segment (shows elevation for heart attack)
+        st_y = baseline + (st_elevation * 100)
+        drawing.add(Line(x, baseline, x+25, st_y, strokeColor=colors.HexColor('#ef4444' if st_elevation > 0.1 else '#10b981'), strokeWidth=2.5))
+        x += 25
+        
+        # T wave
+        t_points = []
+        for i in range(25):
+            tx = x + i
+            ty = st_y - (t_wave * 60) * (i/25) * ((25-i)/25) * 4
+            t_points.append((tx, ty))
+        for i in range(len(t_points)-1):
+            drawing.add(Line(t_points[i][0], t_points[i][1], t_points[i+1][0], t_points[i+1][1], 
+                           strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
+        
+        x += 25
+        
+        # Return to baseline
+        drawing.add(Line(x, t_points[-1][1], x+10, baseline, strokeColor=colors.HexColor('#10b981'), strokeWidth=2.5))
     
     return drawing
 
-def create_vitals_chart(history_data):
-    """Generate vitals trend chart"""
-    drawing = Drawing(400, 200)
-    chart = HorizontalLineChart()
+def create_vitals_chart(report_data):
+    """Generate vitals bar chart"""
+    drawing = Drawing(500, 200)
+    chart = VerticalBarChart()
     chart.x = 50
     chart.y = 50
     chart.height = 125
-    chart.width = 300
+    chart.width = 400
     
-    # Sample data (last 10 readings)
+    # Data for average vitals
     chart.data = [
-        [hr['heart_rate'] for hr in history_data[-10:]],
-        [hr['oxygen_saturation'] for hr in history_data[-10:]]
+        [report_data['averages']['heart_rate'], 
+         report_data['averages']['oxygen_saturation'],
+         report_data['averages']['temperature'] * 10,  # Scale for visibility
+         report_data['averages']['risk_score'] * 5]  # Scale for visibility
     ]
     
-    chart.lines[0].strokeColor = colors.blue
-    chart.lines[1].strokeColor = colors.green
-    chart.lines[0].strokeWidth = 2
-    chart.lines[1].strokeWidth = 2
+    chart.categoryAxis.categoryNames = ['Heart Rate\n(bpm)', 'SpO2\n(%)', 'Temp\n(°C x10)', 'Risk Score\n(x5)']
+    chart.bars[0].fillColor = colors.HexColor('#3b82f6')
+    chart.valueAxis.valueMin = 0
+    chart.valueAxis.valueMax = 120
     
     drawing.add(chart)
     return drawing
@@ -161,12 +199,25 @@ def generate_pdf_report(report_data, patient_name="John Doe", patient_age=45):
     elements.append(summary_table)
     elements.append(Spacer(1, 0.3*inch))
     
+    # Vitals Chart
+    vitals_chart_title = Paragraph("<b>Average Vitals Visualization</b>", styles['Heading2'])
+    elements.append(vitals_chart_title)
+    elements.append(Spacer(1, 0.1*inch))
+    
+    vitals_chart = create_vitals_chart(report_data)
+    elements.append(vitals_chart)
+    elements.append(Spacer(1, 0.3*inch))
+    
     # ECG Waveform
     ecg_title = Paragraph("<b>ECG Waveform Analysis</b>", styles['Heading2'])
     elements.append(ecg_title)
     elements.append(Spacer(1, 0.1*inch))
     
-    ecg_drawing = create_ecg_waveform()
+    # Get ST elevation from highest risk event
+    st_elevation = 0.15 if report_data['highest_risk']['score'] >= 15 else 0.0
+    t_wave = 0.3 - (report_data['highest_risk']['score'] * 0.02)
+    
+    ecg_drawing = create_ecg_waveform(st_elevation=st_elevation, t_wave=t_wave)
     elements.append(ecg_drawing)
     elements.append(Spacer(1, 0.1*inch))
     

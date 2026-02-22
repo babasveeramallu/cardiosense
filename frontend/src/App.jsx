@@ -154,7 +154,7 @@ function App() {
     return points;
   };
 
-  const ecgData = generateECGWaveform();
+  const ecgData = React.useMemo(() => generateECGWaveform(), [vitals.p_wave_duration, vitals.qrs_duration, vitals.st_segment_elevation, vitals.t_wave_amplitude]);
 
   const getRiskColor = (level) => {
     const colors = {

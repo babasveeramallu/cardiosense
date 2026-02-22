@@ -9,6 +9,7 @@ from reportlab.graphics.charts.barcharts import VerticalBarChart
 from reportlab.graphics import renderPDF
 from datetime import datetime
 import io
+import os
 
 def create_ecg_waveform(width=500, height=180, st_elevation=0.0, t_wave=0.3):
     """Generate ECG waveform drawing with dynamic values"""
@@ -122,13 +123,20 @@ def generate_pdf_report(report_data, patient_name="John Doe", patient_age=45):
         alignment=1  # Center
     )
     
-    # Logo placeholder (text-based)
-    logo_text = Paragraph(
-        "<b>❤️ CardioSense AI</b>",
-        ParagraphStyle('Logo', parent=styles['Title'], fontSize=28, textColor=colors.HexColor('#ef4444'), alignment=1)
-    )
-    elements.append(logo_text)
-    elements.append(Spacer(1, 0.2*inch))
+    # Logo
+    logo_path = os.path.join(os.path.dirname(__file__), 'logo.png')
+    if os.path.exists(logo_path):
+        logo = Image(logo_path, width=2*inch, height=0.8*inch)
+        logo.hAlign = 'CENTER'
+        elements.append(logo)
+        elements.append(Spacer(1, 0.2*inch))
+    else:
+        logo_text = Paragraph(
+            "<b>❤️ CardioSense AI</b>",
+            ParagraphStyle('Logo', parent=styles['Title'], fontSize=28, textColor=colors.HexColor('#ef4444'), alignment=1)
+        )
+        elements.append(logo_text)
+        elements.append(Spacer(1, 0.2*inch))
     
     # Title
     title = Paragraph("<b>Cardiac Monitoring Report</b>", title_style)

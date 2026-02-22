@@ -208,44 +208,6 @@ def generate_pdf_report(report_data, patient_name="John Doe", patient_age=45):
     elements.append(vitals_chart)
     elements.append(Spacer(1, 0.3*inch))
     
-    # ECG Waveform
-    ecg_title = Paragraph("<b>ECG Waveform Analysis</b>", styles['Heading2'])
-    elements.append(ecg_title)
-    elements.append(Spacer(1, 0.1*inch))
-    
-    # Get ST elevation from highest risk event
-    st_elevation = 0.15 if report_data['highest_risk']['score'] >= 15 else 0.0
-    t_wave = 0.3 - (report_data['highest_risk']['score'] * 0.02)
-    
-    ecg_drawing = create_ecg_waveform(st_elevation=st_elevation, t_wave=t_wave)
-    elements.append(ecg_drawing)
-    elements.append(Spacer(1, 0.1*inch))
-    
-    ecg_params = [
-        ['ECG Parameter', 'Value', 'Normal Range'],
-        ['P Wave Duration', '0.08 s', '0.06-0.11 s'],
-        ['PR Interval', '0.16 s', '0.12-0.20 s'],
-        ['QRS Duration', '0.09 s', '0.06-0.10 s'],
-        ['QT Interval', '0.40 s', '0.36-0.44 s'],
-        ['T Wave Amplitude', '0.3 mV', '0.1-0.5 mV'],
-        ['ST Segment', '0.0 mV', '-0.05 to 0.1 mV']
-    ]
-    
-    ecg_table = Table(ecg_params, colWidths=[2*inch, 2*inch, 2*inch])
-    ecg_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#10b981')),
-        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 10),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 10),
-        ('TOPPADDING', (0, 0), (-1, -1), 10),
-        ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f3f4f6')),
-        ('GRID', (0, 0), (-1, -1), 1, colors.grey)
-    ]))
-    elements.append(ecg_table)
-    elements.append(Spacer(1, 0.3*inch))
-    
     # Risk Distribution
     risk_title = Paragraph("<b>Risk Assessment Distribution</b>", styles['Heading2'])
     elements.append(risk_title)

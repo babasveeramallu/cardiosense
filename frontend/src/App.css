@@ -162,9 +162,14 @@ button:disabled {
   background: #0f172a;
   padding: 1.5rem;
   border-radius: 8px;
-  line-height: 1.6;
+  line-height: 1.8;
   color: #cbd5e1;
   text-align: left;
+}
+
+.bullet-point {
+  margin: 0.5rem 0;
+  padding-left: 0.5rem;
 }
 
 .chart-container {

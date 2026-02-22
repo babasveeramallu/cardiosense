@@ -32,7 +32,7 @@ def scenario_normal():
             print(f"  HR: {vitals['heart_rate']} | BP: {vitals['blood_pressure_systolic']}/{vitals['blood_pressure_diastolic']} | SpO2: {vitals['oxygen_saturation']}%")
             print(f"  ECG: P={vitals['p_wave_duration']}s, QRS={vitals['qrs_duration']}s, T={vitals['t_wave_amplitude']}mV, ST={vitals['st_segment_elevation']}mV\n")
         
-        time.sleep(2)
+        time.sleep(0.5)
     
     print("✅ Scenario 1 Complete: Patient stable\n")
 
@@ -43,21 +43,20 @@ def scenario_escalating_moderate():
     print("="*70 + "\n")
     
     for i in range(15):
-        # Gradually worsen vitals
         progress = i / 15.0
         
         vitals = {
-            "heart_rate": int(70 + progress * 45),  # 70 → 115
-            "blood_pressure_systolic": int(120 + progress * 35),  # 120 → 155
-            "blood_pressure_diastolic": int(75 + progress * 20),  # 75 → 95
-            "oxygen_saturation": int(99 - progress * 6),  # 99 → 93
-            "temperature": round(36.8 + progress * 1.0, 1),  # 36.8 → 37.8
-            "p_wave_duration": round(0.08 + progress * 0.03, 2),  # Normal → slightly prolonged
-            "pr_interval": round(0.16 + progress * 0.03, 2),  # Normal → borderline
-            "qrs_duration": round(0.08 + progress * 0.02, 2),  # Normal → borderline
-            "qt_interval": round(0.40 + progress * 0.06, 2),  # Normal → prolonged
-            "t_wave_amplitude": round(0.35 - progress * 0.20, 2),  # Normal → flattening
-            "st_segment_elevation": round(0.0 - progress * 0.08, 2)  # Normal → depression
+            "heart_rate": int(70 + progress * 45),
+            "blood_pressure_systolic": int(120 + progress * 35),
+            "blood_pressure_diastolic": int(75 + progress * 20),
+            "oxygen_saturation": int(99 - progress * 6),
+            "temperature": round(36.8 + progress * 1.0, 1),
+            "p_wave_duration": round(0.08 + progress * 0.03, 2),
+            "pr_interval": round(0.16 + progress * 0.03, 2),
+            "qrs_duration": round(0.08 + progress * 0.02, 2),
+            "qt_interval": round(0.40 + progress * 0.06, 2),
+            "t_wave_amplitude": round(0.35 - progress * 0.20, 2),
+            "st_segment_elevation": round(0.0 - progress * 0.08, 2)
         }
         
         response = requests.post(f"{API_URL}/analyze", json=vitals)
@@ -71,7 +70,7 @@ def scenario_escalating_moderate():
                 print(f"  ⚠️  {data['risk_level']} RISK DETECTED")
             print()
         
-        time.sleep(2)
+        time.sleep(0.5)
     
     print("⚠️  Scenario 2 Complete: Patient showing cardiac stress - monitoring recommended\n")
 
@@ -85,17 +84,17 @@ def scenario_critical_heart_attack():
         progress = i / 20.0
         
         vitals = {
-            "heart_rate": int(75 + progress * 85),  # 75 → 160 (severe tachycardia)
-            "blood_pressure_systolic": int(125 + progress * 70),  # 125 → 195 (hypertensive crisis)
-            "blood_pressure_diastolic": int(78 + progress * 50),  # 78 → 128 (severe)
-            "oxygen_saturation": int(98 - progress * 15),  # 98 → 83 (severe hypoxemia)
-            "temperature": round(37.0 + progress * 1.5, 1),  # 37.0 → 38.5
-            "p_wave_duration": round(0.08 + progress * 0.06, 2),  # Normal → severely prolonged
-            "pr_interval": round(0.16 + progress * 0.08, 2),  # Normal → AV block
-            "qrs_duration": round(0.08 + progress * 0.06, 2),  # Normal → bundle branch block
-            "qt_interval": round(0.40 + progress * 0.15, 2),  # Normal → dangerous prolongation
-            "t_wave_amplitude": round(0.30 - progress * 0.50, 2),  # Normal → inverted (ischemia)
-            "st_segment_elevation": round(0.0 + progress * 0.25, 2)  # Normal → STEMI (heart attack)
+            "heart_rate": int(75 + progress * 85),
+            "blood_pressure_systolic": int(125 + progress * 70),
+            "blood_pressure_diastolic": int(78 + progress * 50),
+            "oxygen_saturation": int(98 - progress * 15),
+            "temperature": round(37.0 + progress * 1.5, 1),
+            "p_wave_duration": round(0.08 + progress * 0.06, 2),
+            "pr_interval": round(0.16 + progress * 0.08, 2),
+            "qrs_duration": round(0.08 + progress * 0.06, 2),
+            "qt_interval": round(0.40 + progress * 0.15, 2),
+            "t_wave_amplitude": round(0.30 - progress * 0.50, 2),
+            "st_segment_elevation": round(0.0 + progress * 0.25, 2)
         }
         
         response = requests.post(f"{API_URL}/analyze", json=vitals)
@@ -117,7 +116,7 @@ def scenario_critical_heart_attack():
                 print(f"  🟡 MODERATE RISK - Vitals deteriorating")
             print()
         
-        time.sleep(2)
+        time.sleep(0.5)
     
     print("🚨 Scenario 3 Complete: CRITICAL CARDIAC EVENT - 911 CALLED - EMERGENCY RESPONSE REQUIRED\n")
 

@@ -43,19 +43,24 @@ function App() {
             blood_pressure_diastolic: latest.blood_pressure_diastolic,
             oxygen_saturation: latest.oxygen_saturation,
             temperature: latest.temperature,
-            p_wave_duration: 0.08,
-            pr_interval: 0.16,
-            qrs_duration: 0.09,
-            qt_interval: 0.40,
-            t_wave_amplitude: 0.3,
-            st_segment_elevation: 0.0
+            p_wave_duration: 0.08 + (latest.risk_score * 0.01),
+            pr_interval: 0.16 + (latest.risk_score * 0.01),
+            qrs_duration: 0.09 + (latest.risk_score * 0.005),
+            qt_interval: 0.40 + (latest.risk_score * 0.01),
+            t_wave_amplitude: 0.3 - (latest.risk_score * 0.02),
+            st_segment_elevation: (latest.risk_score > 10 ? 0.15 : 0.0)
           });
           
           // Update analysis
           setAnalysis({
             risk_score: latest.risk_score,
             risk_level: latest.risk_level,
-            explanation: latest.explanation
+            explanation: latest.explanation,
+            emergency_alert: latest.risk_level === 'CRITICAL' ? {
+              call_911: true,
+              reason: 'Critical cardiac event detected',
+              priority: 'IMMEDIATE'
+            } : null
           });
           
           // Update history for charts
@@ -245,6 +250,13 @@ function App() {
           <button onClick={analyzeVitals} disabled={loading}>
             {loading ? 'Analyzing...' : 'Analyze Risk'}
           </button>
+          <button onClick={async () => {
+            const response = await fetch(`${API_URL}/report`);
+            const report = await response.json();
+            alert(JSON.stringify(report, null, 2));
+          }} style={{marginTop: '1rem', background: '#10b981'}}>
+            Generate Report
+          </button>
         </div>
 
         {analysis && (
@@ -256,10 +268,14 @@ function App() {
             <div className="risk-score">Score: {analysis.risk_score}</div>
             {analysis.emergency_alert && (
               <div className="emergency-alert">
-                🚨 {analysis.emergency_alert.reason} - CALLING 911
+                🚨 EMERGENCY: {analysis.emergency_alert.reason} - CALLING 911 NOW!
               </div>
             )}
-            <div className="explanation">{analysis.explanation}</div>
+            <div className="explanation">
+              {analysis.explanation.split('.').filter(s => s.trim()).map((sentence, i) => (
+                <div key={i} className="bullet-point">• {sentence.trim()}.</div>
+              ))}
+            </div>
           </div>
         )}
 

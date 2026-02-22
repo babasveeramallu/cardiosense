@@ -169,7 +169,7 @@ function App() {
   return (
     <div className="app">
       <header>
-        <img src="/logo.png" alt="CardioSense AI" style={{height: '60px', marginBottom: '5px'}} />
+        <img src="/logo.png" alt="CardioSense AI" style={{height: '75px', marginBottom: '5px'}} />
         <p>Real-time Cardiac Risk Monitoring</p>
         <div className="live-toggle">
           <label>

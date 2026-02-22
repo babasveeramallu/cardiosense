@@ -23,6 +23,8 @@ function App() {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
   const [liveMode, setLiveMode] = useState(false);
+  const [patientName, setPatientName] = useState('John Doe');
+  const [patientAge, setPatientAge] = useState(45);
 
   // Auto-refresh latest reading every 2 seconds in live mode
   useEffect(() => {
@@ -188,6 +190,22 @@ function App() {
           <h2>Vital Signs Input</h2>
           <div className="input-grid">
             <div className="input-group">
+              <label>Patient Name</label>
+              <input
+                type="text"
+                value={patientName}
+                onChange={(e) => setPatientName(e.target.value)}
+              />
+            </div>
+            <div className="input-group">
+              <label>Patient Age</label>
+              <input
+                type="number"
+                value={patientAge}
+                onChange={(e) => setPatientAge(parseInt(e.target.value))}
+              />
+            </div>
+            <div className="input-group">
               <label>Heart Rate (bpm)</label>
               <input
                 type="number"
@@ -251,9 +269,9 @@ function App() {
             {loading ? 'Analyzing...' : 'Analyze Risk'}
           </button>
           <button onClick={async () => {
-            window.open(`${API_URL}/report/pdf`, '_blank');
+            window.open(`${API_URL}/report/pdf?patient_name=${encodeURIComponent(patientName)}&patient_age=${patientAge}`, '_blank');
           }} style={{marginTop: '1rem', background: '#10b981'}}>
-            Download PDF Report
+            📄 Download PDF Report
           </button>
         </div>
 

@@ -76,9 +76,9 @@ def get_report():
     return get_summary_report()
 
 @app.get("/report/pdf")
-def get_pdf_report():
+def get_pdf_report(patient_name: str = "John Doe", patient_age: int = 45):
     report = get_summary_report()
-    pdf_buffer = generate_pdf_report(report)
+    pdf_buffer = generate_pdf_report(report, patient_name, patient_age)
     return StreamingResponse(
         pdf_buffer,
         media_type="application/pdf",

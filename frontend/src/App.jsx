@@ -10,7 +10,13 @@ function App() {
     blood_pressure_systolic: 120,
     blood_pressure_diastolic: 80,
     oxygen_saturation: 98,
-    temperature: 37.0
+    temperature: 37.0,
+    p_wave_duration: 0.08,
+    pr_interval: 0.16,
+    qrs_duration: 0.09,
+    qt_interval: 0.40,
+    t_wave_amplitude: 0.3,
+    st_segment_elevation: 0.0
   });
   
   const [analysis, setAnalysis] = useState(null);
@@ -33,13 +39,60 @@ function App() {
         hr: vitals.heart_rate,
         bp: vitals.blood_pressure_systolic,
         spo2: vitals.oxygen_saturation,
-        risk: data.risk_score
+        risk: data.risk_score,
+        st: vitals.st_segment_elevation,
+        t_wave: vitals.t_wave_amplitude
       }]);
     } catch (error) {
       console.error('Error:', error);
     }
     setLoading(false);
   };
+
+  const generateECGWaveform = () => {
+    const points = [];
+    const baseY = 50;
+    
+    for (let x = 0; x < 100; x++) {
+      let y = baseY;
+      
+      // P wave (atrial depolarization)
+      if (x >= 10 && x <= 20) {
+        y = baseY - (vitals.p_wave_duration * 50) * Math.sin((x - 10) * Math.PI / 10);
+      }
+      // PR segment
+      else if (x > 20 && x < 30) {
+        y = baseY;
+      }
+      // QRS complex (ventricular depolarization)
+      else if (x >= 30 && x <= 40) {
+        if (x < 35) {
+          y = baseY + 10; // Q wave
+        } else if (x < 38) {
+          y = baseY - (vitals.qrs_duration * 200); // R wave (tall spike)
+        } else {
+          y = baseY + 5; // S wave
+        }
+      }
+      // ST segment (critical for heart attack detection)
+      else if (x > 40 && x < 55) {
+        y = baseY + (vitals.st_segment_elevation * 100); // Elevation = heart attack
+      }
+      // T wave (repolarization)
+      else if (x >= 55 && x <= 75) {
+        y = baseY - (vitals.t_wave_amplitude * 80) * Math.sin((x - 55) * Math.PI / 20);
+      }
+      // Baseline
+      else {
+        y = baseY;
+      }
+      
+      points.push({ x, y });
+    }
+    return points;
+  };
+
+  const ecgData = generateECGWaveform();
 
   const getRiskColor = (level) => {
     const colors = {
@@ -103,6 +156,24 @@ function App() {
                 onChange={(e) => setVitals({...vitals, temperature: parseFloat(e.target.value)})}
               />
             </div>
+            <div className="input-group">
+              <label>ST Elevation (mV)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={vitals.st_segment_elevation}
+                onChange={(e) => setVitals({...vitals, st_segment_elevation: parseFloat(e.target.value)})}
+              />
+            </div>
+            <div className="input-group">
+              <label>T Wave (mV)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={vitals.t_wave_amplitude}
+                onChange={(e) => setVitals({...vitals, t_wave_amplitude: parseFloat(e.target.value)})}
+              />
+            </div>
           </div>
           <button onClick={analyzeVitals} disabled={loading}>
             {loading ? 'Analyzing...' : 'Analyze Risk'}
@@ -116,9 +187,34 @@ function App() {
               {analysis.risk_level}
             </div>
             <div className="risk-score">Score: {analysis.risk_score}</div>
+            {analysis.emergency_alert && (
+              <div className="emergency-alert">
+                🚨 {analysis.emergency_alert.reason} - CALLING 911
+              </div>
+            )}
             <div className="explanation">{analysis.explanation}</div>
           </div>
         )}
+
+        <div className="ecg-container">
+          <h2>ECG Waveform</h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={ecgData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+              <XAxis dataKey="x" hide />
+              <YAxis domain={[0, 100]} hide />
+              <Line type="monotone" dataKey="y" stroke="#10b981" strokeWidth={2} dot={false} />
+            </LineChart>
+          </ResponsiveContainer>
+          <div className="ecg-labels">
+            <span>P: {vitals.p_wave_duration}s</span>
+            <span>PR: {vitals.pr_interval}s</span>
+            <span>QRS: {vitals.qrs_duration}s</span>
+            <span>QT: {vitals.qt_interval}s</span>
+            <span>ST: {vitals.st_segment_elevation}mV</span>
+            <span>T: {vitals.t_wave_amplitude}mV</span>
+          </div>
+        </div>
 
         {history.length > 0 && (
           <div className="chart-container">

@@ -137,6 +137,45 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.ecg-container {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  grid-column: 1 / -1;
+}
+
+.ecg-labels {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: #0f172a;
+  border-radius: 8px;
+}
+
+.ecg-labels span {
+  color: #10b981;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.emergency-alert {
+  background: #dc2626;
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin: 1rem 0;
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
 @media (min-width: 768px) {
   .dashboard {
     grid-template-columns: 1fr 1fr;

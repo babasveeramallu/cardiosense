@@ -169,8 +169,7 @@ function App() {
   return (
     <div className="app">
       <header>
-        <img src="/logo.png" alt="CardioSense AI" style={{height: '60px', marginBottom: '10px'}} />
-        <h1>CardioSense AI</h1>
+        <img src="/logo.png" alt="CardioSense AI" style={{height: '60px', marginBottom: '5px'}} />
         <p>Real-time Cardiac Risk Monitoring</p>
         <div className="live-toggle">
           <label>
@@ -285,7 +284,7 @@ function App() {
             <div className="risk-score">Score: {analysis.risk_score}</div>
             {analysis.emergency_alert && (
               <div className="emergency-alert">
-                🚨 EMERGENCY: {analysis.emergency_alert.reason} - CALLING 911 NOW!
+                🚨 EMERGENCY: CALL 911 NOW!
               </div>
             )}
             <div className="explanation">

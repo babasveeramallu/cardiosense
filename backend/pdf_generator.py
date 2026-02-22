@@ -126,7 +126,7 @@ def generate_pdf_report(report_data, patient_name="John Doe", patient_age=45):
     # Logo
     logo_path = os.path.join(os.path.dirname(__file__), 'logo.png')
     if os.path.exists(logo_path):
-        logo = Image(logo_path, width=2*inch, height=0.8*inch)
+        logo = Image(logo_path, width=2.5*inch, height=1*inch)
         logo.hAlign = 'CENTER'
         elements.append(logo)
         elements.append(Spacer(1, 0.2*inch))

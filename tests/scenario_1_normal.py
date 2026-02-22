@@ -9,7 +9,7 @@ def scenario_normal():
     print("SCENARIO 1: NORMAL VITALS - Healthy Patient")
     print("="*70 + "\n")
     
-    for i in range(10):
+    for i in range(5):
         vitals = {
             "heart_rate": random.randint(65, 80),
             "blood_pressure_systolic": random.randint(110, 125),
@@ -27,11 +27,10 @@ def scenario_normal():
         response = requests.post(f"{API_URL}/analyze", json=vitals)
         if response.status_code == 200:
             data = response.json()
-            print(f"Reading {i+1}/10 - Risk: {data['risk_level']} (Score: {data['risk_score']})")
-            print(f"  HR: {vitals['heart_rate']} | BP: {vitals['blood_pressure_systolic']}/{vitals['blood_pressure_diastolic']} | SpO2: {vitals['oxygen_saturation']}%")
-            print(f"  ECG: ST={vitals['st_segment_elevation']}mV, T={vitals['t_wave_amplitude']}mV\n")
+            print(f"Reading {i+1}/5 - Risk: {data['risk_level']} (Score: {data['risk_score']})")
+            print(f"  HR: {vitals['heart_rate']} | BP: {vitals['blood_pressure_systolic']}/{vitals['blood_pressure_diastolic']} | SpO2: {vitals['oxygen_saturation']}%\n")
         
-        time.sleep(0.3)
+        time.sleep(0.1)
     
     print("✅ Scenario 1 Complete: Patient stable\n")
 

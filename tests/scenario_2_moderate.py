@@ -9,8 +9,8 @@ def scenario_escalating_moderate():
     print("SCENARIO 2: ESCALATING TO MODERATE - Cardiac Stress Developing")
     print("="*70 + "\n")
     
-    for i in range(15):
-        progress = i / 15.0
+    for i in range(5):
+        progress = i / 5.0
         
         vitals = {
             "heart_rate": int(70 + progress * 45),
@@ -29,17 +29,16 @@ def scenario_escalating_moderate():
         response = requests.post(f"{API_URL}/analyze", json=vitals)
         if response.status_code == 200:
             data = response.json()
-            print(f"Reading {i+1}/15 - Risk: {data['risk_level']} (Score: {data['risk_score']})")
+            print(f"Reading {i+1}/5 - Risk: {data['risk_level']} (Score: {data['risk_score']})")
             print(f"  HR: {vitals['heart_rate']} | BP: {vitals['blood_pressure_systolic']}/{vitals['blood_pressure_diastolic']} | SpO2: {vitals['oxygen_saturation']}%")
-            print(f"  ECG: ST={vitals['st_segment_elevation']}mV, T={vitals['t_wave_amplitude']}mV")
             
             if data['risk_level'] in ['MODERATE', 'HIGH']:
                 print(f"  ⚠️  {data['risk_level']} RISK DETECTED")
             print()
         
-        time.sleep(0.3)
+        time.sleep(0.1)
     
-    print("⚠️  Scenario 2 Complete: Patient showing cardiac stress - monitoring recommended\n")
+    print("⚠️  Scenario 2 Complete: Patient showing cardiac stress\n")
 
 if __name__ == "__main__":
     scenario_escalating_moderate()

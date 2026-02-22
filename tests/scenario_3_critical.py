@@ -9,8 +9,8 @@ def scenario_critical_heart_attack():
     print("SCENARIO 3: CRITICAL - HEART ATTACK PROGRESSION → 911 EMERGENCY")
     print("="*70 + "\n")
     
-    for i in range(20):
-        progress = i / 20.0
+    for i in range(5):
+        progress = i / 5.0
         
         vitals = {
             "heart_rate": int(75 + progress * 85),
@@ -29,25 +29,19 @@ def scenario_critical_heart_attack():
         response = requests.post(f"{API_URL}/analyze", json=vitals)
         if response.status_code == 200:
             data = response.json()
-            print(f"Reading {i+1}/20 - Risk: {data['risk_level']} (Score: {data['risk_score']})")
+            print(f"Reading {i+1}/5 - Risk: {data['risk_level']} (Score: {data['risk_score']})")
             print(f"  HR: {vitals['heart_rate']} | BP: {vitals['blood_pressure_systolic']}/{vitals['blood_pressure_diastolic']} | SpO2: {vitals['oxygen_saturation']}%")
-            print(f"  ECG: ST={vitals['st_segment_elevation']}mV (STEMI if >0.1), T={vitals['t_wave_amplitude']}mV")
+            print(f"  ECG: ST={vitals['st_segment_elevation']}mV (STEMI if >0.1)")
             
             if 'emergency_alert' in data:
-                print(f"\n  🚨🚨🚨 EMERGENCY ALERT 🚨🚨🚨")
-                print(f"  {data['emergency_alert']['reason']}")
-                print(f"  Priority: {data['emergency_alert']['priority']}")
-                print(f"  Action: CALLING 911 NOW")
-                print(f"  🚨🚨🚨 EMERGENCY ALERT 🚨🚨🚨\n")
+                print(f"\n  🚨🚨🚨 EMERGENCY: CALLING 911 NOW 🚨🚨🚨\n")
             elif data['risk_level'] == 'HIGH':
-                print(f"  🔴 HIGH RISK - Approaching critical threshold")
-            elif data['risk_level'] == 'MODERATE':
-                print(f"  🟡 MODERATE RISK - Vitals deteriorating")
+                print(f"  🔴 HIGH RISK")
             print()
         
-        time.sleep(0.3)
+        time.sleep(0.1)
     
-    print("🚨 Scenario 3 Complete: CRITICAL CARDIAC EVENT - 911 CALLED - EMERGENCY RESPONSE REQUIRED\n")
+    print("🚨 Scenario 3 Complete: CRITICAL EVENT - 911 CALLED\n")
 
 if __name__ == "__main__":
     scenario_critical_heart_attack()

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import './App.css';
 
-const API_URL = 'http://192.168.12.195:8000';
+const API_URL = 'http://172.20.10.4:8000';
 
 function App() {
   const [vitals, setVitals] = useState({

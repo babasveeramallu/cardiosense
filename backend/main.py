@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from datetime import datetime
 from risk_engine import calculate_risk
 from llm_service import get_explanation
 from database import init_db, save_reading, get_all_readings, get_summary_report, clear_all_readings
+from pdf_generator import generate_pdf_report
 
 app = FastAPI()
 
@@ -71,6 +74,16 @@ def get_history():
 @app.get("/report")
 def get_report():
     return get_summary_report()
+
+@app.get("/report/pdf")
+def get_pdf_report():
+    report = get_summary_report()
+    pdf_buffer = generate_pdf_report(report)
+    return StreamingResponse(
+        pdf_buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename=cardiosense_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"}
+    )
 
 @app.delete("/clear")
 def clear_history():

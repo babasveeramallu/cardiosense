@@ -251,11 +251,9 @@ function App() {
             {loading ? 'Analyzing...' : 'Analyze Risk'}
           </button>
           <button onClick={async () => {
-            const response = await fetch(`${API_URL}/report`);
-            const report = await response.json();
-            alert(JSON.stringify(report, null, 2));
+            window.open(`${API_URL}/report/pdf`, '_blank');
           }} style={{marginTop: '1rem', background: '#10b981'}}>
-            Generate Report
+            Download PDF Report
           </button>
         </div>
 

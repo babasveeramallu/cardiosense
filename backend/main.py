@@ -34,5 +34,5 @@ def analyze_vitals(vitals: VitalSigns):
         "risk_score": risk_score,
         "risk_level": risk_level,
         "explanation": explanation,
-        "vitals": vitals.dict()
+        "vitals": vitals.model_dump()
     }

@@ -31,6 +31,40 @@ header p {
   font-size: 1.1rem;
 }
 
+.live-toggle {
+  margin-top: 1rem;
+}
+
+.live-toggle label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.live-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.live-toggle span {
+  color: #94a3b8;
+  transition: color 0.3s;
+}
+
+.live-toggle .live-active {
+  color: #ef4444;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 .dashboard {
   max-width: 1400px;
   margin: 0 auto;

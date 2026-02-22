@@ -22,6 +22,61 @@ function App() {
   const [analysis, setAnalysis] = useState(null);
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [liveMode, setLiveMode] = useState(false);
+
+  // Auto-refresh latest reading every 2 seconds in live mode
+  useEffect(() => {
+    if (!liveMode) return;
+    
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`${API_URL}/history`);
+        const data = await response.json();
+        
+        if (data.length > 0) {
+          const latest = data[0];
+          
+          // Update vitals with latest reading
+          setVitals({
+            heart_rate: latest.heart_rate,
+            blood_pressure_systolic: latest.blood_pressure_systolic,
+            blood_pressure_diastolic: latest.blood_pressure_diastolic,
+            oxygen_saturation: latest.oxygen_saturation,
+            temperature: latest.temperature,
+            p_wave_duration: 0.08,
+            pr_interval: 0.16,
+            qrs_duration: 0.09,
+            qt_interval: 0.40,
+            t_wave_amplitude: 0.3,
+            st_segment_elevation: 0.0
+          });
+          
+          // Update analysis
+          setAnalysis({
+            risk_score: latest.risk_score,
+            risk_level: latest.risk_level,
+            explanation: latest.explanation
+          });
+          
+          // Update history for charts
+          const historyData = data.slice(0, 20).reverse().map(r => ({
+            time: new Date(r.timestamp).toLocaleTimeString(),
+            hr: r.heart_rate,
+            bp: r.blood_pressure_systolic,
+            spo2: r.oxygen_saturation,
+            risk: r.risk_score,
+            st: 0,
+            t_wave: 0.3
+          }));
+          setHistory(historyData);
+        }
+      } catch (error) {
+        console.error('Error fetching live data:', error);
+      }
+    }, 2000);
+    
+    return () => clearInterval(interval);
+  }, [liveMode]);
 
   const analyzeVitals = async () => {
     setLoading(true);
@@ -109,6 +164,18 @@ function App() {
       <header>
         <h1>CardioSense AI</h1>
         <p>Real-time Cardiac Risk Monitoring</p>
+        <div className="live-toggle">
+          <label>
+            <input 
+              type="checkbox" 
+              checked={liveMode} 
+              onChange={(e) => setLiveMode(e.target.checked)}
+            />
+            <span className={liveMode ? 'live-active' : ''}>
+              {liveMode ? '🔴 LIVE' : '⚪ Manual Mode'}
+            </span>
+          </label>
+        </div>
       </header>
 
       <div className="dashboard">

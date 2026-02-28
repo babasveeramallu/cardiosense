@@ -2,6 +2,8 @@
 
 Real-time cardiac risk monitoring system using FastAPI, ChromaDB, Llama 3.2, and React.
 
+<iframe width="560" height="315" src="https://www.youtube.com/embed/-rksfieV-WA?si=cMxQeEYMwXnPjqZ6" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 ## Features
 
 - ✅ Real-time vital signs monitoring (HR, BP, SpO2, Temperature)
